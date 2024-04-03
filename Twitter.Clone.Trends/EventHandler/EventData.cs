@@ -2,6 +2,6 @@
 
 public record EventData
 {
-    public required string IPAddress { get; set; }
-    public required List<string> Hashtags { get; set; }
+    public required string IPAddress { get; init; }
+    public required List<string> Hashtags { get; init; }
 }

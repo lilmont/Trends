@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using Twitter.Clone.Trends.EventHandler;
 using Twitter.Clone.Trends.Persistence;
+using Twitter.Clone.Trends.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +30,8 @@ builder.Services.AddMassTransit(configure =>
         rabbitmqConfigure.ConfigureEndpoints(context);
     });
 });
+
+builder.Services.AddSingleton<HashtagsService>();
 
 var app = builder.Build();
 

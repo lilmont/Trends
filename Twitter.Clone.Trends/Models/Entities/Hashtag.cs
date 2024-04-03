@@ -1,8 +1,13 @@
-﻿namespace Twitter.Clone.Trends.Models.Entities;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
+
+namespace Twitter.Clone.Trends.Models.Entities;
 
 public record Hashtag
 {
-    public required string Id { get; set; }
+    [BsonId]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string Id { get; set; } = string.Empty;
     public required string Name { get; set; }
     public required DateTime DateCreated { get; set; }
     public required string IPAddress { get; set; }
