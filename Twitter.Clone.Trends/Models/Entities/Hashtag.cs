@@ -1,7 +1,4 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson;
-
-namespace Twitter.Clone.Trends.Models.Entities;
+﻿namespace Twitter.Clone.Trends.Models.Entities;
 
 public record Hashtag
 {

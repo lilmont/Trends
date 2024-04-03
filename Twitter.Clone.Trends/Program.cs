@@ -1,9 +1,4 @@
-﻿using MassTransit;
-using Twitter.Clone.Trends.EventHandler;
-using Twitter.Clone.Trends.Persistence;
-using Twitter.Clone.Trends.Services;
-
-var builder = WebApplication.CreateBuilder(args);
+﻿var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

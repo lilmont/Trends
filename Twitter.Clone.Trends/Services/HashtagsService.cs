@@ -1,9 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using MongoDB.Driver;
-using Twitter.Clone.Trends.Models.Entities;
-using Twitter.Clone.Trends.Persistence;
-
-namespace Twitter.Clone.Trends.Services;
+﻿namespace Twitter.Clone.Trends.Services;
 
 public class HashtagsService
 {
