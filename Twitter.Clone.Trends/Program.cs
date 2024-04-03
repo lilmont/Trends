@@ -14,20 +14,22 @@ builder.Services.Configure<TrendsDatabaseSettings>(
 
 builder.Services.AddMassTransit(configure =>
 {
-    configure.AddConsumer<EventConsumer>();
+    configure.AddConsumers(typeof(Program).Assembly);
 
-    configure.UsingRabbitMq((context, rabbitmqConfigure) =>
+    configure.UsingRabbitMq((context, cfg) =>
     {
         var settings = builder.Configuration.GetSection("EventBrokerConfiguration")
-        .Get<EventBrokerSettings>();
+        .Get<EventBrokerSettings>()!;
 
-        rabbitmqConfigure.Host(settings!.Host, hostConfigure =>
+        cfg.UseRawJsonDeserializer();
+
+        cfg.Host(settings.Host, hostConfigure =>
         {
             hostConfigure.Username(settings.Username);
             hostConfigure.Password(settings.Password);
         });
 
-        rabbitmqConfigure.ConfigureEndpoints(context);
+        cfg.ConfigureEndpoints(context);
     });
 });
 
