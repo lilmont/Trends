@@ -1,4 +1,6 @@
-﻿using Twitter.Clone.Trends.Persistence;
+﻿using MassTransit;
+using Twitter.Clone.Trends.EventHandler;
+using Twitter.Clone.Trends.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +10,25 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.Configure<TrendsDatabaseSettings>(
     builder.Configuration.GetSection("TrendsDatabase"));
+
+builder.Services.AddMassTransit(configure =>
+{
+    configure.AddConsumer<EventConsumer>();
+
+    configure.UsingRabbitMq((context, rabbitmqConfigure) =>
+    {
+        var settings = builder.Configuration.GetSection("EventBrokerConfiguration")
+        .Get<EventBrokerSettings>();
+
+        rabbitmqConfigure.Host(settings!.Host, hostConfigure =>
+        {
+            hostConfigure.Username(settings.Username);
+            hostConfigure.Password(settings.Password);
+        });
+
+        rabbitmqConfigure.ConfigureEndpoints(context);
+    });
+});
 
 var app = builder.Build();
 
