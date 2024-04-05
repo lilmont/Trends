@@ -8,6 +8,7 @@ global using MongoDB.Bson;
 global using MongoDB.Driver;
 
 // Trends
+global using Twitter.Clone.Trends;
 global using Twitter.Clone.Trends.Models.Entities;
 global using Twitter.Clone.Trends.Services;
 global using Twitter.Clone.Trends.Persistence;

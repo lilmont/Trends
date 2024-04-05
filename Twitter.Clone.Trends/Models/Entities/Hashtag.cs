@@ -1,7 +1,9 @@
 ﻿namespace Twitter.Clone.Trends.Models.Entities;
 
-public record Hashtag
+public class Hashtag
 {
+    public const string CollectionName = "Hashtags";
+
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; } = string.Empty;
@@ -10,3 +12,4 @@ public record Hashtag
     public required string IPAddress { get; set; }
     public bool IsProcessed { get; set; }
 }
+

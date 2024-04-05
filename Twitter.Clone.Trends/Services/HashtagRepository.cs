@@ -1,10 +1,11 @@
 ﻿namespace Twitter.Clone.Trends.Services;
 
-public class HashtagsService
+public class HashtagRepository
 {
     private readonly IMongoCollection<Hashtag> _hashtagsCollection;
+    private readonly static InsertOneOptions _insertOneOptions = new();
 
-    public HashtagsService(
+    public HashtagRepository(
         IOptions<TrendsDatabaseSettings> trendsDatabaseSettings)
     {
         var mongoClient = new MongoClient(
@@ -14,9 +15,9 @@ public class HashtagsService
             trendsDatabaseSettings.Value.DatabaseName);
 
         _hashtagsCollection = mongoDatabase.GetCollection<Hashtag>(
-            trendsDatabaseSettings.Value.HashtagsCollectionName);
+            Hashtag.CollectionName);
     }
 
-    public async Task CreateAsync(Hashtag newHashtag) =>
-        await _hashtagsCollection.InsertOneAsync(newHashtag);
+    public async Task CreateAsync(Hashtag newHashtag, CancellationToken cancellationToken) =>
+        await _hashtagsCollection.InsertOneAsync(newHashtag, _insertOneOptions, cancellationToken);
 }
