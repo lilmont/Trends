@@ -21,7 +21,7 @@ public class HashtagLog
 
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public required string Id { get; set; }
+    public string Id { get; set; } 
 
     [BsonRequired]
     public string HashtagId { get; set; }
@@ -32,8 +32,7 @@ public class HashtagLog
     [BsonRequired]
     public string IPAddress { get; set; }
 
-    public bool IsProcessed { get; set; }
+    public bool IsProcessed { get; set; } = false;
 
-    public int Count { get; set; }
 }
 
