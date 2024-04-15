@@ -30,7 +30,7 @@ public class HashtagService : IHashtagService
                 Name = hashtagName,
                 Id = hashtagId,
 
-            });
+            }, new CancellationToken());
 
             id = hashtagId;
         }

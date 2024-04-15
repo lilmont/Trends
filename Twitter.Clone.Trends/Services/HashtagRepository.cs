@@ -40,9 +40,4 @@ public class HashtagRepository
         await _hashtagLogsCollection.Find(_ => true).ToListAsync();
     public async Task<HashtagLog> GetLogByIdAsync(string id) =>
         await _hashtagLogsCollection.Find(hashtag => hashtag.Id == id).FirstOrDefaultAsync();
-
-    internal Task CreateHashtagAsync(Hashtag hashtag)
-    {
-        throw new NotImplementedException();
-    }
 }
