@@ -1,5 +1,6 @@
 ﻿// Microsoft
 global using Microsoft.Extensions.Options;
+global using System.Linq;
 
 // Third-party
 global using MassTransit;
