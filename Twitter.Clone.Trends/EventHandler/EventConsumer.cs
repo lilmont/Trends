@@ -16,15 +16,17 @@ public class EventConsumer(HashtagRepository hashtagsService,
                 context.Message.Hashtags.Count > 0)
             {
                 foreach (var hashtag in context.Message.Hashtags)
-                    await _hashtagsService.CreateAsync(
+                {
+                    await _hashtagsService.CreateHashtagAsync(
                         new Hashtag
                         {
-                            IPAddress = context.Message.IPAddress,
+                            //IPAddress = context.Message.IPAddress,
                             Name = hashtag,
-                            DateCreated = DateTime.UtcNow,
-                            IsProcessed = false,
+                            //DateCreated = DateTime.UtcNow,
+                            //IsProcessed = false,
                         },
                         context.CancellationToken);
+                }
             }
         }
         catch (Exception ex)
