@@ -1,11 +1,11 @@
 ﻿namespace Twitter.Clone.Trends.EventHandler;
 
-public class EventConsumer(HashtagRepository hashtagsService,
-    ILogger<EventConsumer> logger)
+public class HashtagConsumer(HashtagRepository hashtagsService,
+    ILogger<HashtagConsumer> logger)
     : IConsumer<HashtagsEvent>
 {
     private readonly HashtagRepository _hashtagsService = hashtagsService;
-    private readonly ILogger<EventConsumer> _logger = logger;
+    private readonly ILogger<HashtagConsumer> _logger = logger;
 
     public async Task Consume(ConsumeContext<HashtagsEvent> context)
     {
@@ -22,7 +22,6 @@ public class EventConsumer(HashtagRepository hashtagsService,
                             IPAddress = context.Message.IPAddress,
                             Name = hashtag,
                             DateCreated = DateTime.UtcNow,
-                            IsProcessed = false,
                         },
                         context.CancellationToken);
             }
