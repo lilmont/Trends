@@ -1,4 +1,7 @@
-﻿// Microsoft
+﻿// System
+global using System.Text.RegularExpressions;
+
+// Microsoft
 global using Microsoft.Extensions.Options;
 
 // Third-party
@@ -6,6 +9,7 @@ global using MassTransit;
 global using MongoDB.Bson.Serialization.Attributes;
 global using MongoDB.Bson;
 global using MongoDB.Driver;
+global using FluentValidation;
 
 // Trends
 global using Twitter.Clone.Trends;
