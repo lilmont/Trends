@@ -10,5 +10,7 @@ public class Hashtag
     public required string Name { get; set; }
     public required DateTime DateCreated { get; set; }
     public required string IPAddress { get; set; }
+    public string? Country { get; set; }
+    public string? Continent { get; set; }
 }
 

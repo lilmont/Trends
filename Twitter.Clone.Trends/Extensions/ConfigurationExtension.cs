@@ -27,4 +27,20 @@ public static class ConfigurationExtension
         });
         return services;
     }
+
+    public static IServiceCollection ConfigureLocatorSettings(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<LocatorServiceSettings>(
+             configuration.GetSection(LocatorServiceSettings.SectionName));
+
+        return services;
+    }
+
+    public static IServiceCollection ConfigureBackgroundSettings(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<AddGeoDataBackgroundServiceSettings>(
+             configuration.GetSection(AddGeoDataBackgroundServiceSettings.SectionName));
+
+        return services;
+    }
 }
