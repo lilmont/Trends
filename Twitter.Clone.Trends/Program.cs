@@ -11,11 +11,14 @@ builder.Services.ConfigureBroker(builder.Configuration);
 builder.Services.ConfigureLocatorSettings(builder.Configuration);
 builder.Services.ConfigureBackgroundSettings(builder.Configuration);
 
-builder.Services.AddHostedService<AddGeoDataBackgroundService>();
+builder.Services.AddHostedService<InboxBackgroundService>();
 
 builder.Services.AddSingleton<HashtagRepository>();
+builder.Services.AddSingleton<InboxHashtagRepository>();
 
-builder.Services.AddHttpClient<AddGeoDataBackgroundService>();
+builder.Services.AddHttpClient<InboxBackgroundService>();
+
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 var app = builder.Build();
 

@@ -20,17 +20,4 @@ public class HashtagRepository
 
     public async Task CreateAsync(Hashtag newHashtag, CancellationToken cancellationToken) =>
         await _hashtagsCollection.InsertOneAsync(newHashtag, _insertOneOptions, cancellationToken);
-
-    public async Task<List<Hashtag>> GetHashtagsWithoutGeoInfoAsync(CancellationToken cancellationToken) =>
-        await _hashtagsCollection
-        .Find(
-            p => string.IsNullOrEmpty(p.Country) ||
-            string.IsNullOrEmpty(p.Continent)
-            )
-        .ToListAsync(cancellationToken);
-
-    public async Task UpdateGeoInfoAsync(string id, string country, string continent, CancellationToken cancellationToken) =>
-        await _hashtagsCollection.UpdateOneAsync(p => p.Id == id, Builders<Hashtag>.Update
-            .Set(p => p.Country, country)
-            .Set(p => p.Continent, continent));
 }

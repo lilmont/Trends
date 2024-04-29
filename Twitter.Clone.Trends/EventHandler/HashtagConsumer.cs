@@ -1,40 +1,22 @@
-﻿using FluentValidation;
-using Twitter.Clone.Trends.Models.Validators;
+﻿namespace Twitter.Clone.Trends.EventHandler;
 
-namespace Twitter.Clone.Trends.EventHandler;
-
-public class HashtagConsumer(HashtagRepository hashtagsService,
+public class HashtagConsumer(InboxHashtagRepository inboxHashtagRepository,
     ILogger<HashtagConsumer> logger)
     : IConsumer<HashtagsEvent>
 {
-    private readonly HashtagRepository _hashtagsService = hashtagsService;
+    private readonly InboxHashtagRepository _inboxHashtagRepository = inboxHashtagRepository;
     private readonly ILogger<HashtagConsumer> _logger = logger;
 
     public async Task Consume(ConsumeContext<HashtagsEvent> context)
     {
         HashtagEventValidator validator = new();
-        var validationResult = validator.Validate(context.Message);
         try
         {
+            var validationResult = validator.Validate(context.Message);
             if (!validationResult.IsValid)
-            {
-                foreach (var failure in validationResult.Errors)
-                {
-                    _logger.LogError("Validation error on property {PropertyName}: {ErrorMessage}",
-                        failure.PropertyName, failure.ErrorMessage);
-                }
-                return;
-            }
+                throw new Exception(validationResult.Errors.ToString());
 
-            foreach (var hashtag in context.Message.Hashtags)
-                await _hashtagsService.CreateAsync(
-                    new Hashtag
-                    {
-                        IPAddress = context.Message.IPAddress,
-                        Name = hashtag,
-                        DateCreated = DateTime.UtcNow,
-                    },
-                    context.CancellationToken);
+            await _inboxHashtagRepository.CreateAsync(Inbox.CreateMessage(context.Message), context.CancellationToken);
         }
         catch (Exception ex)
         {

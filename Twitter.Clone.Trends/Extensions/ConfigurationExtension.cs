@@ -38,8 +38,8 @@ public static class ConfigurationExtension
 
     public static IServiceCollection ConfigureBackgroundSettings(this IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<AddGeoDataBackgroundServiceSettings>(
-             configuration.GetSection(AddGeoDataBackgroundServiceSettings.SectionName));
+        services.Configure<AppSettings.InboxBackgroundServiceSettings>(
+             configuration.GetSection(AppSettings.InboxBackgroundServiceSettings.SectionName));
 
         return services;
     }
