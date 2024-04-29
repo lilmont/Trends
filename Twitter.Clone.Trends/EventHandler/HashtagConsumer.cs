@@ -9,13 +9,8 @@ public class HashtagConsumer(InboxHashtagRepository inboxHashtagRepository,
 
     public async Task Consume(ConsumeContext<HashtagsEvent> context)
     {
-        HashtagEventValidator validator = new();
         try
         {
-            var validationResult = validator.Validate(context.Message);
-            if (!validationResult.IsValid)
-                throw new Exception(validationResult.Errors.ToString());
-
             await _inboxHashtagRepository.CreateAsync(Inbox.CreateMessage(context.Message), context.CancellationToken);
         }
         catch (Exception ex)
