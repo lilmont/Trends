@@ -1,16 +1,18 @@
-﻿namespace Twitter.Clone.Trends.Services;
+﻿
+
+namespace Twitter.Clone.Trends.Services;
 
 public class InboxBackgroundService(
     InboxHashtagRepository inboxHashtagRepository,
     IOptions<InboxBackgroundServiceSettings> inboxBackgroundServiceSettings,
     ILogger<InboxBackgroundService> logger,
-    IMediator mediator)
+    InboxProcessor inboxProcessor)
     : BackgroundService
 {
     private readonly InboxHashtagRepository _inboxHashtagRepository = inboxHashtagRepository;
     private readonly IOptions<InboxBackgroundServiceSettings> _inboxBackgroundServiceSettings = inboxBackgroundServiceSettings;
     private readonly ILogger<InboxBackgroundService> _logger = logger;
-    private readonly IMediator _mediator = mediator;
+    private readonly InboxProcessor _inboxProcessor = inboxProcessor;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -22,7 +24,9 @@ public class InboxBackgroundService(
 
                 foreach (var record in unprocessedInbox)
                 {
-                    if (await _mediator.Send(new HashtagCommand { Inbox = record }))
+                    var success = await _inboxProcessor.ProcessMessageAsync(record.MessageType, record.Content, stoppingToken);
+
+                    if (success)
                     {
                         await _inboxHashtagRepository.UpdateProcessedStatusAsync(record.Id, stoppingToken);
                     }

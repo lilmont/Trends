@@ -13,7 +13,8 @@ public class HashtagCommandHandler(
     {
         try
         {
-            var hashtagContent = JsonSerializer.Deserialize<HashtagsEvent>(request.Inbox.Content);
+            var hashtagContent = JsonSerializer.Deserialize<HashtagsEvent>(request.InboxContent);
+
             if (hashtagContent != null && hashtagContent.Hashtags.Any())
             {
                 var response = await _httpClient

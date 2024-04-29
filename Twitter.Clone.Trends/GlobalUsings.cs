@@ -26,4 +26,5 @@ global using Twitter.Clone.Trends.AppSettings;
 global using Twitter.Clone.Trends.Handlers;
 global using Twitter.Clone.Trends.Models.Validators;
 global using Twitter.Clone.Trends.Responses;
+global using Twitter.Clone.Trends.Strategies;
 
