@@ -13,7 +13,6 @@ builder.Services.Configure<TrendsDatabaseSettings>(
 builder.Services.ConfigureBroker(builder.Configuration);
 
 builder.Services.AddSingleton<HashtagRepository>();
-builder.Services.AddSingleton<IHashtagService, HashtagService>();
 
 var app = builder.Build();
 

@@ -10,9 +10,6 @@ public class Hashtag
 
     [BsonRequired]
     public string Name { get; set; }
-
-    public List<HashtagLog>? Log { get; set; }
-
 }
 
 //public class HashtagLog
