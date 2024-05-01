@@ -19,6 +19,7 @@ public class MakeTrendsBackgroundService(
                 var pipeline = new PipelineBuilder()
                     .AddPipe(typeof(TrendsByCountryPipe))
                     .AddPipe(typeof(TrendsByContinentPipe))
+                    .AddPipe(typeof(TrendsGlobalPipe))
                     .Build();
 
                 pipeline(_hashtagRepository);
