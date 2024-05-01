@@ -9,7 +9,7 @@ public class TrendsByCountryPipe(
     private readonly IOptions<MakeTrendsSettings> _makeTrendsSettings = makeTrendsSettings;
     private readonly TrendsByCountryRepository _trendsByCountryRepository = trendsByCountryRepository;
 
-    public async override void Handle(HashtagRepository context)
+    public async override void HandleAsync(HashtagRepository context, CancellationToken cancellationToken)
     {
         var trends = (await context.GetHashtagsByTimeSpanAsync(_makeTrendsSettings.Value.CountryTrendTimeSpan))
              .GroupBy(x => new { x.Name, x.Country })
@@ -23,10 +23,12 @@ public class TrendsByCountryPipe(
 
         foreach (var trend in trends)
         {
-            if (await trendsByCountryRepository.TrendExistsAsync(trend.Name, trend.Country))
-                await _trendsByCountryRepository.UpdateAsync(trend.Name, trend.Country, trend.Count);
+            if (await trendsByCountryRepository.TrendExistsAsync(trend.Name, trend.Country, cancellationToken))
+                await _trendsByCountryRepository.UpdateAsync(trend.Name, trend.Country, trend.Count, cancellationToken);
             else
-                await _trendsByCountryRepository.CreateAsync(trend);
+                await _trendsByCountryRepository.CreateAsync(trend, cancellationToken);
         }
+
+        if (_next is not null) _next(context);
     }
 }

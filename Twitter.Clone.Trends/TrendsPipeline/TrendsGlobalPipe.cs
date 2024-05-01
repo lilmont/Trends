@@ -9,7 +9,7 @@ public class TrendsGlobalPipe(
     private readonly IOptions<MakeTrendsSettings> _makeTrendsSettings = makeTrendsSettings;
     private readonly TrendsGlobalRepository _trendsGlobalRepository = trendsGlobalRepository;
 
-    public async override void Handle(HashtagRepository context)
+    public async override void HandleAsync(HashtagRepository context, CancellationToken cancellationToken)
     {
         var trends = (await context.GetHashtagsByTimeSpanAsync(_makeTrendsSettings.Value.GlobalTrendTimeSpan))
              .GroupBy(x => new { x.Name })
@@ -23,11 +23,12 @@ public class TrendsGlobalPipe(
 
         foreach (var trend in trends)
         {
-            if (await _trendsGlobalRepository.TrendExistsAsync(trend.Name))
-                await _trendsGlobalRepository.UpdateAsync(trend.Name, trend.Count);
+            if (await _trendsGlobalRepository.TrendExistsAsync(trend.Name, cancellationToken))
+                await _trendsGlobalRepository.UpdateAsync(trend.Name, trend.Count, cancellationToken);
             else
-                await _trendsGlobalRepository.CreateAsync(trend);
+                await _trendsGlobalRepository.CreateAsync(trend, cancellationToken);
         }
 
+        if (_next is not null) _next(context);
     }
 }

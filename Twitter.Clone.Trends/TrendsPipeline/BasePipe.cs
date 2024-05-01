@@ -7,5 +7,5 @@ public abstract class BasePipe
     {
         _next = next;
     }
-    public abstract void Handle(HashtagRepository context);
+    public abstract void HandleAsync(HashtagRepository context, CancellationToken cancellationToken);
 }

@@ -9,15 +9,15 @@ public class PipelineBuilder
         return this;
     }
 
-    public Action<HashtagRepository> Build()
+    public Action<HashtagRepository,CancellationToken> Build()
     {
         var lastIndex = _pipes.Count - 1;
         var selectedPipe = (BasePipe)Activator.CreateInstance(_pipes[lastIndex], null);
         for (int i = lastIndex - 1; i > 0; i--)
         {
-            selectedPipe = (BasePipe)Activator.CreateInstance(_pipes[i], new[] { selectedPipe.Handle });
+            selectedPipe = (BasePipe)Activator.CreateInstance(_pipes[i], new[] { selectedPipe.HandleAsync });
         }
-        var firstPipe = (BasePipe)Activator.CreateInstance(_pipes[0], new[] { selectedPipe.Handle });
-        return firstPipe.Handle;
+        var firstPipe = (BasePipe)Activator.CreateInstance(_pipes[0], new[] { selectedPipe.HandleAsync });
+        return firstPipe.HandleAsync;
     }
 }

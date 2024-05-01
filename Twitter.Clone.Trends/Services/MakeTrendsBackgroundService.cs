@@ -22,7 +22,7 @@ public class MakeTrendsBackgroundService(
                     .AddPipe(typeof(TrendsGlobalPipe))
                     .Build();
 
-                pipeline(_hashtagRepository);
+                pipeline(_hashtagRepository,stoppingToken);
 
                 await Task.Delay(_makeTrendsBackgroundServiceSettings.Value.Frequency, stoppingToken);
             }
