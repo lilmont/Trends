@@ -1,4 +1,6 @@
-﻿namespace Twitter.Clone.Trends.EventHandler;
+﻿using Twitter.Clone.Trends.Repositories;
+
+namespace Twitter.Clone.Trends.EventHandler;
 
 public class EventConsumer(HashtagRepository hashtagsService,
     ILogger<EventConsumer> logger)

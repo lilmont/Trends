@@ -1,6 +1,5 @@
 ﻿using Twitter.Clone.Trends.Extensions;
-using Twitter.Clone.Trends.Services;
-
+using Twitter.Clone.Trends.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
