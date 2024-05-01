@@ -14,3 +14,7 @@ global using Twitter.Clone.Trends.Models.Entities;
 global using Twitter.Clone.Trends.Services;
 global using Twitter.Clone.Trends.Persistence;
 global using Twitter.Clone.Trends.EventHandler;
+global using Twitter.Clone.Trends.AppSettings;
+global using Twitter.Clone.Trends.Repositories;
+global using Twitter.Clone.Trends.TrendsPipeline;
+global using Twitter.Clone.Trends.Extensions;

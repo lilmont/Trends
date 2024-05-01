@@ -1,7 +1,4 @@
-﻿using Twitter.Clone.Trends.Extensions;
-using Twitter.Clone.Trends.Repositories;
-
-var builder = WebApplication.CreateBuilder(args);
+﻿var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -13,6 +10,8 @@ builder.Services.Configure<TrendsDatabaseSettings>(
 builder.Services.ConfigureBroker(builder.Configuration);
 
 builder.Services.AddSingleton<HashtagRepository>();
+
+builder.Services.AddHostedService<MakeTrendsBackgroundService>();
 
 var app = builder.Build();
 

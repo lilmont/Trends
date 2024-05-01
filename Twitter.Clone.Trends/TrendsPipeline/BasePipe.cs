@@ -1,6 +1,4 @@
-﻿using Twitter.Clone.Trends.Repositories;
-
-namespace Twitter.Clone.Trends.TrendsPipeline;
+﻿namespace Twitter.Clone.Trends.TrendsPipeline;
 
 public abstract class BasePipe
 {

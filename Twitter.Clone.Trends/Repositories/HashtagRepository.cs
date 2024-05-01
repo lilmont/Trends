@@ -20,4 +20,13 @@ public class HashtagRepository
 
     public async Task CreateAsync(Hashtag newHashtag, CancellationToken cancellationToken) =>
         await _hashtagsCollection.InsertOneAsync(newHashtag, _insertOneOptions, cancellationToken);
+
+    public async Task<List<Hashtag>> GetHashtagsByTimeSpanAsync(int timeSpanInDays)
+    {
+        var filter = Builders<Hashtag>.Filter.Gte(
+            x => x.DateCreated,
+            DateTime.UtcNow.AddDays(-timeSpanInDays)
+        );
+        return await _hashtagsCollection.Find(filter).ToListAsync();
+    }
 }
