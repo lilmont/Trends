@@ -37,7 +37,7 @@ public class InboxBackgroundService(
         catch (Exception ex)
         {
             _logger.LogError(ex,
-                "Error occurred while carrying out background service: TrendsMakerBackgroundService");
+                "Error occurred while carrying out background service: InboxBackgroundService");
         }
     }
 }
