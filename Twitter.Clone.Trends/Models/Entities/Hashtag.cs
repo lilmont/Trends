@@ -7,29 +7,10 @@ public class Hashtag
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; } = string.Empty;
-
-    [BsonRequired]
-    public string Name { get; set; }
+    public required string Name { get; set; }
+    public required DateTime DateCreated { get; set; }
+    public required string IPAddress { get; set; }
+    public string? Country { get; set; }
+    public string? Continent { get; set; }
 }
-
-//public class HashtagLog
-//{
-//    public const string CollectionName = "HashtagLogs";
-
-//    [BsonId]
-//    [BsonRepresentation(BsonType.ObjectId)]
-//    public string Id { get; set; } 
-
-//    [BsonRequired]
-//    public string HashtagId { get; set; }
-
-//    [BsonRequired]
-//    public DateTime DateCreated { get; set; }
-
-//    [BsonRequired]
-//    public string IPAddress { get; set; }
-
-//    public bool IsProcessed { get; set; } = false;
-
-//}
 
