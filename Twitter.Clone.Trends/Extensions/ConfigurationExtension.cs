@@ -27,4 +27,20 @@ public static class ConfigurationExtension
         });
         return services;
     }
+
+    public static IServiceCollection ConfigureLocatorSettings(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<LocatorServiceSettings>(
+             configuration.GetSection(LocatorServiceSettings.SectionName));
+
+        return services;
+    }
+
+    public static IServiceCollection ConfigureBackgroundSettings(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<AppSettings.InboxBackgroundServiceSettings>(
+             configuration.GetSection(AppSettings.InboxBackgroundServiceSettings.SectionName));
+
+        return services;
+    }
 }

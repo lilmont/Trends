@@ -1,4 +1,4 @@
-﻿namespace Twitter.Clone.Trends.Services;
+﻿namespace Twitter.Clone.Trends.Repositories;
 
 public class HashtagRepository
 {
