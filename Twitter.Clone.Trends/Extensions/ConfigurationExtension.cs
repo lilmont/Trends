@@ -27,4 +27,20 @@ public static class ConfigurationExtension
         });
         return services;
     }
+
+    public static IServiceCollection ConfigureMakeTrendsBackgroundServiceSettings(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<MakeTrendsBackgroundServiceSettings>(
+             configuration.GetSection(MakeTrendsBackgroundServiceSettings.SectionName));
+
+        return services;
+    }
+
+    public static IServiceCollection ConfigureMakeTrendsSettings(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<MakeTrendsSettings>(
+             configuration.GetSection(MakeTrendsSettings.SectionName));
+
+        return services;
+    }
 }
