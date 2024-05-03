@@ -1,13 +1,17 @@
 ﻿namespace Twitter.Clone.Trends.TrendsPipeline;
 
-public class TrendsGlobalPipe(
-    Action<HashtagRepository> next,
-    IOptions<MakeTrendsSettings> makeTrendsSettings,
-    TrendsGlobalRepository trendsGlobalRepository)
-    : BasePipe(next)
+public class TrendsGlobalPipe : BasePipe
 {
-    private readonly IOptions<MakeTrendsSettings> _makeTrendsSettings = makeTrendsSettings;
-    private readonly TrendsGlobalRepository _trendsGlobalRepository = trendsGlobalRepository;
+    private readonly IOptions<MakeTrendsSettings> _makeTrendsSettings;
+    private readonly TrendsGlobalRepository _trendsGlobalRepository;
+
+    public TrendsGlobalPipe(Action<HashtagRepository, CancellationToken> next,
+    IOptions<MakeTrendsSettings> makeTrendsSettings,
+    TrendsGlobalRepository trendsGlobalRepository) : base(next)
+    {
+        _makeTrendsSettings = makeTrendsSettings;
+        _trendsGlobalRepository = trendsGlobalRepository;
+    }
 
     public async override void HandleAsync(HashtagRepository context, CancellationToken cancellationToken)
     {
@@ -21,14 +25,17 @@ public class TrendsGlobalPipe(
              })
              .ToList();
 
-        foreach (var trend in trends)
+        if (trends is not null)
         {
-            if (await _trendsGlobalRepository.TrendExistsAsync(trend.Name, cancellationToken))
-                await _trendsGlobalRepository.UpdateAsync(trend.Name, trend.Count, cancellationToken);
-            else
-                await _trendsGlobalRepository.CreateAsync(trend, cancellationToken);
+            foreach (var trend in trends)
+            {
+                if (await _trendsGlobalRepository.TrendExistsAsync(trend.Name, cancellationToken))
+                    await _trendsGlobalRepository.UpdateAsync(trend.Name, trend.Count, cancellationToken);
+                else
+                    await _trendsGlobalRepository.CreateAsync(trend, cancellationToken);
+            }
         }
 
-        if (_next is not null) _next(context);
+        if (_next is not null) _next(context, cancellationToken);
     }
 }

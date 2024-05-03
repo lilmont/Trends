@@ -1,13 +1,17 @@
 ﻿namespace Twitter.Clone.Trends.TrendsPipeline;
 
-public class TrendsByContinentPipe(
-    Action<HashtagRepository> next,
-    IOptions<MakeTrendsSettings> makeTrendsSettings,
-    TrendsByContinentRepository trendsByContinentRepository)
-    : BasePipe(next)
+public class TrendsByContinentPipe : BasePipe
 {
-    private readonly IOptions<MakeTrendsSettings> _makeTrendsSettings = makeTrendsSettings;
-    private readonly TrendsByContinentRepository _trendsByContinentRepository = trendsByContinentRepository;
+    private readonly IOptions<MakeTrendsSettings> _makeTrendsSettings;
+    private readonly TrendsByContinentRepository _trendsByContinentRepository;
+
+    public TrendsByContinentPipe(Action<HashtagRepository, CancellationToken> next,
+    IOptions<MakeTrendsSettings> makeTrendsSettings,
+    TrendsByContinentRepository trendsByContinentRepository) : base(next)
+    {
+        _makeTrendsSettings = makeTrendsSettings;
+        _trendsByContinentRepository = trendsByContinentRepository;
+    }
 
     public async override void HandleAsync(HashtagRepository context, CancellationToken cancellationToken)
     {
@@ -21,14 +25,17 @@ public class TrendsByContinentPipe(
              })
              .ToList();
 
-        foreach (var trend in trends)
+        if (trends is not null)
         {
-            if (await _trendsByContinentRepository.TrendExistsAsync(trend.Name, trend.Continent, cancellationToken))
-                await _trendsByContinentRepository.UpdateAsync(trend.Name, trend.Continent, trend.Count, cancellationToken);
-            else
-                await _trendsByContinentRepository.CreateAsync(trend, cancellationToken);
+            foreach (var trend in trends)
+            {
+                if (await _trendsByContinentRepository.TrendExistsAsync(trend.Name, trend.Continent, cancellationToken))
+                    await _trendsByContinentRepository.UpdateAsync(trend.Name, trend.Continent, trend.Count, cancellationToken);
+                else
+                    await _trendsByContinentRepository.CreateAsync(trend, cancellationToken);
+            }
         }
 
-        if (_next is not null) _next(context);
+        if (_next is not null) _next(context, cancellationToken);
     }
 }

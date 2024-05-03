@@ -2,8 +2,8 @@
 
 public abstract class BasePipe
 {
-    protected readonly Action<HashtagRepository> _next;
-    public BasePipe(Action<HashtagRepository> next)
+    protected readonly Action<HashtagRepository, CancellationToken> _next;
+    public BasePipe(Action<HashtagRepository, CancellationToken> next)
     {
         _next = next;
     }

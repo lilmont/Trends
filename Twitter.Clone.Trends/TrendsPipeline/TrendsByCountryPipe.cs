@@ -1,13 +1,17 @@
 ﻿namespace Twitter.Clone.Trends.TrendsPipeline;
 
-public class TrendsByCountryPipe(
-    Action<HashtagRepository> next,
-    IOptions<MakeTrendsSettings> makeTrendsSettings,
-    TrendsByCountryRepository trendsByCountryRepository)
-    : BasePipe(next)
+public class TrendsByCountryPipe : BasePipe
 {
-    private readonly IOptions<MakeTrendsSettings> _makeTrendsSettings = makeTrendsSettings;
-    private readonly TrendsByCountryRepository _trendsByCountryRepository = trendsByCountryRepository;
+    private readonly IOptions<MakeTrendsSettings> _makeTrendsSettings;
+    private readonly TrendsByCountryRepository _trendsByCountryRepository;
+
+    public TrendsByCountryPipe(Action<HashtagRepository, CancellationToken> next,
+    IOptions<MakeTrendsSettings> makeTrendsSettings,
+    TrendsByCountryRepository trendsByCountryRepository) : base(next)
+    {
+        _makeTrendsSettings = makeTrendsSettings;
+        _trendsByCountryRepository = trendsByCountryRepository;
+    }
 
     public async override void HandleAsync(HashtagRepository context, CancellationToken cancellationToken)
     {
@@ -21,14 +25,17 @@ public class TrendsByCountryPipe(
              })
              .ToList();
 
-        foreach (var trend in trends)
+        if (trends is not null)
         {
-            if (await trendsByCountryRepository.TrendExistsAsync(trend.Name, trend.Country, cancellationToken))
-                await _trendsByCountryRepository.UpdateAsync(trend.Name, trend.Country, trend.Count, cancellationToken);
-            else
-                await _trendsByCountryRepository.CreateAsync(trend, cancellationToken);
+            foreach (var trend in trends)
+            {
+                if (await _trendsByCountryRepository.TrendExistsAsync(trend.Name, trend.Country, cancellationToken))
+                    await _trendsByCountryRepository.UpdateAsync(trend.Name, trend.Country, trend.Count, cancellationToken);
+                else
+                    await _trendsByCountryRepository.CreateAsync(trend, cancellationToken);
+            }
         }
 
-        if (_next is not null) _next(context);
+        if (_next is not null) _next(context, cancellationToken);
     }
 }
