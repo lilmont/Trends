@@ -16,8 +16,8 @@ public class Inbox
     {
         return new Inbox()
         {
-            MessageType = typeof(TModel).Name,
-            Content = JsonSerializer.Serialize(model),
+            MessageType = typeof(TModel).FullName!,
+            Content = System.Text.Json.JsonSerializer.Serialize(model),
             DateCreated = DateTime.UtcNow
         };
     }
