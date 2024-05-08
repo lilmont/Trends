@@ -11,8 +11,8 @@ builder.Services.ConfigureBackgroundSettings(builder.Configuration);
 
 builder.Services.AddHostedService<InboxBackgroundService>();
 
-builder.Services.AddSingleton<HashtagRepository>();
-builder.Services.AddSingleton<InboxHashtagRepository>();
+builder.Services.AddScoped<HashtagRepository>();
+builder.Services.AddScoped<InboxHashtagRepository>();
 
 builder.Services.AddHttpClient<InboxBackgroundService>();
 

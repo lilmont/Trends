@@ -4,9 +4,7 @@ public class Inbox
 {
     public const string CollectionName = "Inboxes";
 
-    [BsonId]
-    [BsonRepresentation(BsonType.ObjectId)]
-    public string Id { get; set; } = string.Empty;
+    public ObjectId Id { get; set; }
     public required string MessageType { get; set; }
     public required string Content { get; set; }
     public required DateTime DateCreated { get; set; }

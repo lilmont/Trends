@@ -13,12 +13,12 @@ public class InboxHashtagRepository(TrendsDbContext dbContext)
     public async Task<List<Inbox>> GetUnprocessedInboxAsync(CancellationToken cancellationToken) =>
         await _dbContext.Inboxes.Where(p => p.IsProcessed == false).ToListAsync(cancellationToken);
 
-    public async Task UpdateProcessedStatusAsync(string id, CancellationToken cancellationToken)
+    public async Task UpdateProcessedStatusAsync(ObjectId id, CancellationToken cancellationToken)
     {
         var currentInbox = await _dbContext.Inboxes.FindAsync(id, cancellationToken);
         if (currentInbox is not null)
         {
-            currentInbox.IsProcessed = false;
+            currentInbox.IsProcessed = true;
             _dbContext.Entry(currentInbox).State = EntityState.Modified;
             await _dbContext.SaveChangesAsync(cancellationToken);
         }

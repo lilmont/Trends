@@ -41,7 +41,7 @@ public static class ConfigurationExtension
             }
             options.UseMongoDB(settings.Host, settings.DatabaseName);
             
-        },ServiceLifetime.Singleton);
+        });
         return services;
     }
 

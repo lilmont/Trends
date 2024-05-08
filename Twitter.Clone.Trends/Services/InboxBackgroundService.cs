@@ -1,16 +1,14 @@
 ﻿namespace Twitter.Clone.Trends.Services;
 
 public class InboxBackgroundService(
-    InboxHashtagRepository inboxHashtagRepository,
+    IServiceScopeFactory scopeFactory,
     IOptions<InboxBackgroundServiceSettings> inboxBackgroundServiceSettings,
-    ILogger<InboxBackgroundService> logger,
-    IMediator mediator)
+    ILogger<InboxBackgroundService> logger)
     : BackgroundService
 {
-    private readonly InboxHashtagRepository _inboxHashtagRepository = inboxHashtagRepository;
+    private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
     private readonly IOptions<InboxBackgroundServiceSettings> _inboxBackgroundServiceSettings = inboxBackgroundServiceSettings;
     private readonly ILogger<InboxBackgroundService> _logger = logger;
-    private readonly IMediator _mediator = mediator;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -18,21 +16,27 @@ public class InboxBackgroundService(
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                var unprocessedInbox = await _inboxHashtagRepository.GetUnprocessedInboxAsync(stoppingToken);
-
-                foreach (var message in unprocessedInbox)
+                using (var scope = _scopeFactory.CreateScope())
                 {
-                    var assembly = Assembly.GetExecutingAssembly();
-                    var type = assembly.GetType(message.MessageType);
+                    var inboxHashtagRepository = scope.ServiceProvider.GetRequiredService<InboxHashtagRepository>();
+                    var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-                    if (type is not null)
+                    var unprocessedInbox = await inboxHashtagRepository.GetUnprocessedInboxAsync(stoppingToken);
+
+                    foreach (var message in unprocessedInbox)
                     {
-                        var msg = JsonConvert.DeserializeObject(message.Content, type);
-                        if (msg is INotification notify)
-                            await _mediator.Publish(notify, stoppingToken);
-                    }
+                        var assembly = Assembly.GetExecutingAssembly();
+                        var type = assembly.GetType(message.MessageType);
 
-                    await _inboxHashtagRepository.UpdateProcessedStatusAsync(message.Id, stoppingToken);
+                        if (type is not null)
+                        {
+                            var msg = JsonConvert.DeserializeObject(message.Content, type);
+                            if (msg is INotification notify)
+                                await mediator.Publish(notify, stoppingToken);
+                        }
+
+                        await inboxHashtagRepository.UpdateProcessedStatusAsync(message.Id, stoppingToken);
+                    }
                 }
                 await Task.Delay(_inboxBackgroundServiceSettings.Value.Frequency, stoppingToken);
             }
