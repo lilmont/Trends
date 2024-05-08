@@ -5,15 +5,16 @@ global using System.Reflection;
 
 // Microsoft
 global using Microsoft.Extensions.Options;
+global using Microsoft.EntityFrameworkCore;
 
 // Third-party
 global using MassTransit;
 global using MongoDB.Bson.Serialization.Attributes;
 global using MongoDB.Bson;
-global using MongoDB.Driver;
 global using FluentValidation;
 global using MediatR;
 global using Newtonsoft.Json;
+global using MongoDB.EntityFrameworkCore.Extensions;
 
 // Trends
 global using Twitter.Clone.Trends.Repositories;

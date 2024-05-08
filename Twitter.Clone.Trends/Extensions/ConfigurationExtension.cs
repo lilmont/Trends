@@ -28,6 +28,23 @@ public static class ConfigurationExtension
         return services;
     }
 
+    public static IServiceCollection ConfigureMongoDb(this IServiceCollection services, IConfiguration configuration)
+    {
+        var settings = configuration.GetSection(TrendsDatabaseSettings.SectionName)
+                .Get<TrendsDatabaseSettings>();
+
+        services.AddDbContext<TrendsDbContext>(options =>
+        {
+            if (settings is null)
+            {
+                throw new Exception("Invalid settings!");
+            }
+            options.UseMongoDB(settings.Host, settings.DatabaseName);
+            
+        },ServiceLifetime.Singleton);
+        return services;
+    }
+
     public static IServiceCollection ConfigureLocatorSettings(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<LocatorServiceSettings>(
@@ -38,8 +55,8 @@ public static class ConfigurationExtension
 
     public static IServiceCollection ConfigureBackgroundSettings(this IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<AppSettings.InboxBackgroundServiceSettings>(
-             configuration.GetSection(AppSettings.InboxBackgroundServiceSettings.SectionName));
+        services.Configure<InboxBackgroundServiceSettings>(
+             configuration.GetSection(InboxBackgroundServiceSettings.SectionName));
 
         return services;
     }

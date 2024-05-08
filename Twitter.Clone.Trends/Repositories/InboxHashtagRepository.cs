@@ -1,29 +1,26 @@
 ﻿namespace Twitter.Clone.Trends.Repositories;
 
-public class InboxHashtagRepository
+public class InboxHashtagRepository(TrendsDbContext dbContext)
 {
-    private readonly IMongoCollection<Inbox> _inboxesCollection;
-    private readonly static InsertOneOptions _insertOneOptions = new();
+    private readonly TrendsDbContext _dbContext = dbContext;
 
-    public InboxHashtagRepository(
-        IOptions<TrendsDatabaseSettings> trendsDatabaseSettings)
+    public async Task CreateAsync(Inbox newInbox, CancellationToken cancellationToken)
     {
-        var mongoClient = new MongoClient(
-            trendsDatabaseSettings.Value.ConnectionString);
-
-        var mongoDatabase = mongoClient.GetDatabase(
-            trendsDatabaseSettings.Value.DatabaseName);
-
-        _inboxesCollection = mongoDatabase.GetCollection<Inbox>(
-            Inbox.CollectionName);
+        await _dbContext.AddAsync(newInbox, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task CreateAsync(Inbox newInbox, CancellationToken cancellationToken) =>
-        await _inboxesCollection.InsertOneAsync(newInbox, _insertOneOptions, cancellationToken);
-
     public async Task<List<Inbox>> GetUnprocessedInboxAsync(CancellationToken cancellationToken) =>
-        await _inboxesCollection.Find(p => p.IsProcessed == false).ToListAsync(cancellationToken);
+        await _dbContext.Inboxes.Where(p => p.IsProcessed == false).ToListAsync(cancellationToken);
 
-    public async Task UpdateProcessedStatusAsync(string id, CancellationToken cancellationToken) =>
-        await _inboxesCollection.UpdateOneAsync(p => p.Id == id, Builders<Inbox>.Update.Set(p => p.IsProcessed, true));
+    public async Task UpdateProcessedStatusAsync(string id, CancellationToken cancellationToken)
+    {
+        var currentInbox = await _dbContext.Inboxes.FindAsync(id, cancellationToken);
+        if (currentInbox is not null)
+        {
+            currentInbox.IsProcessed = false;
+            _dbContext.Entry(currentInbox).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+    }
 }
