@@ -11,10 +11,10 @@ builder.Services.ConfigureBroker(builder.Configuration);
 builder.Services.ConfigureMakeTrendsBackgroundServiceSettings(builder.Configuration);
 builder.Services.ConfigureMakeTrendsSettings(builder.Configuration);
 
-builder.Services.AddSingleton<HashtagRepository>();
-builder.Services.AddSingleton<TrendsByContinentRepository>();
-builder.Services.AddSingleton<TrendsByCountryRepository>();
-builder.Services.AddSingleton<TrendsGlobalRepository>();
+builder.Services.AddScoped<HashtagRepository>();
+builder.Services.AddScoped<TrendsByContinentRepository>();
+builder.Services.AddScoped<TrendsByCountryRepository>();
+builder.Services.AddScoped<TrendsGlobalRepository>();
 
 builder.Services.AddHostedService<MakeTrendsBackgroundService>();
 
