@@ -4,8 +4,15 @@
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.Configure<TrendsDatabaseSettings>(
-    builder.Configuration.GetSection("TrendsDatabase"));
+builder.Services.ConfigureBroker(builder.Configuration);
+builder.Services.ConfigureMongoDb(builder.Configuration);
+builder.Services.ConfigureLocatorSettings(builder.Configuration);
+builder.Services.ConfigureBackgroundSettings(builder.Configuration);
+
+builder.Services.AddHostedService<InboxBackgroundService>();
+
+builder.Services.AddScoped<HashtagRepository>();
+builder.Services.AddScoped<InboxHashtagRepository>();
 
 builder.Services.ConfigureBroker(builder.Configuration);
 builder.Services.ConfigureMakeTrendsBackgroundServiceSettings(builder.Configuration);
@@ -15,8 +22,10 @@ builder.Services.AddScoped<HashtagRepository>();
 builder.Services.AddScoped<TrendsByContinentRepository>();
 builder.Services.AddScoped<TrendsByCountryRepository>();
 builder.Services.AddScoped<TrendsGlobalRepository>();
+builder.Services.AddHttpClient<InboxBackgroundService>();
 
 builder.Services.AddHostedService<MakeTrendsBackgroundService>();
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
 var app = builder.Build();
 

@@ -1,8 +1,8 @@
 ﻿namespace Twitter.Clone.Trends.Persistence;
 
-public class TrendsDatabaseSettings
+public record TrendsDatabaseSettings
 {
-    public string ConnectionString { get; set; } = null!;
-    public string DatabaseName { get; set; } = null!;
-    public string HashtagsCollectionName { get; set; } = null!;
+    public const string SectionName = "TrendsDatabase";
+    public string Host { get; set; } = default!;
+    public string DatabaseName { get; set; } = default!;
 }
