@@ -20,26 +20,20 @@ public class HashtagCommandHandler(
             if (validationResult.IsValid)
             {
                 var response = await _httpClient
-                    .GetAsync(_locatorServiceOptions.Value.URL + request.IPAddress, cancellationToken);
-                response.EnsureSuccessStatusCode();
-                var jsonResponse = await response.Content.ReadAsStringAsync(cancellationToken);
-                LocatorServiceResponse geoInformation = null!;
+                    .GetFromJsonAsync<LocatorServiceResponse>(_locatorServiceOptions.Value.URL + request.IPAddress, cancellationToken);
 
-                if (!string.IsNullOrEmpty(jsonResponse))
-                {
-                    geoInformation = System.Text.Json.JsonSerializer.Deserialize<LocatorServiceResponse>(jsonResponse)!;
-                }
+                if (response is null) throw new NullReferenceException("Locator Service response is null!");
 
                 foreach (var hashtag in request.Hashtags)
                 {
                     await _hashtagRepository.CreateAsync(
-                        new Hashtag()
+                        new Hashtag
                         {
                             Name = hashtag,
                             DateCreated = DateTime.UtcNow,
                             IPAddress = request.IPAddress,
-                            Country = geoInformation?.CountryName,
-                            Continent = geoInformation?.ContinentName
+                            Country = response.CountryName,
+                            Continent = response.ContinentName
                         },
                         cancellationToken);
                 }
@@ -48,7 +42,7 @@ public class HashtagCommandHandler(
         catch (Exception ex)
         {
             _logger.LogError(ex,
-               "Error occurred in HashtagCommandHandler for entry: {0}", request);
+               "Error occurred in HashtagCommandHandler for entry: {request}", request);
         }
     }
 }
