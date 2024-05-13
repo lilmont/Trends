@@ -1,38 +1,28 @@
 ﻿namespace Twitter.Clone.Trends.Repositories;
 
-public class TrendsByContinentRepository
+public class TrendsByContinentRepository(TrendsDbContext dbContext)
 {
-    private readonly IMongoCollection<TrendsByContinent> _trendsByContinentCollection;
-    private readonly static InsertOneOptions _insertOneOptions = new();
-    private readonly static UpdateOptions _updateOptions = new();
+    private readonly TrendsDbContext _dbContext = dbContext;
 
-    public TrendsByContinentRepository(
-        IOptions<TrendsDatabaseSettings> trendsDatabaseSettings)
+    public async Task CreateAsync(TrendByContinent newTrend, CancellationToken cancellationToken)
     {
-        var mongoClient = new MongoClient(
-            trendsDatabaseSettings.Value.ConnectionString);
-
-        var mongoDatabase = mongoClient.GetDatabase(
-            trendsDatabaseSettings.Value.DatabaseName);
-
-        _trendsByContinentCollection = mongoDatabase.GetCollection<TrendsByContinent>(
-            TrendsByContinent.CollectionName);
+        await _dbContext.TrendsByContinent.AddAsync(newTrend, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task CreateAsync(TrendsByContinent newTrend, CancellationToken cancellationToken) =>
-        await _trendsByContinentCollection.InsertOneAsync(newTrend, _insertOneOptions, cancellationToken);
+    public async Task<bool> TrendExistsAsync(string name, string continent, CancellationToken cancellationToken) =>
+        await _dbContext.TrendsByContinent.Where(p => p.Name == name && p.Continent == continent)
+        .AnyAsync(cancellationToken);
 
-    public async Task<bool> TrendExistsAsync(string name, string continent, CancellationToken cancellationToken)
+    public async Task UpdateAsync(string name, string continent, int count, CancellationToken cancellationToken)
     {
-        var filter = Builders<TrendsByContinent>.Filter.And(
-        Builders<TrendsByContinent>.Filter.Eq(x => x.Name, name),
-            Builders<TrendsByContinent>.Filter.Eq(x => x.Continent, continent));
-
-        return await _trendsByContinentCollection.Find(filter).AnyAsync(cancellationToken);
+        var currentTrend = await _dbContext.TrendsByContinent
+            .SingleOrDefaultAsync(p => p.Name == name && p.Continent == continent, cancellationToken);
+        if (currentTrend is not null)
+        {
+            currentTrend.Count = count;
+            _dbContext.Entry(currentTrend).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
     }
-
-    public async Task UpdateAsync(string name, string continent, int count, CancellationToken cancellationToken) =>
-        await _trendsByContinentCollection
-        .UpdateOneAsync(p => p.Name == name && p.Continent == continent,
-            Builders<TrendsByContinent>.Update.Set(p => p.Count, count), _updateOptions, cancellationToken);
 }

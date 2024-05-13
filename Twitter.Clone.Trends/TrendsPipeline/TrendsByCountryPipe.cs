@@ -17,7 +17,7 @@ public class TrendsByCountryPipe : BasePipe
     {
         var trends = (await context.GetHashtagsByTimeSpanAsync(_makeTrendsSettings.Value.CountryTrendTimeSpan))
              .GroupBy(x => new { x.Name, x.Country })
-             .Select(g => new TrendsByCountry
+             .Select(g => new TrendByCountry
              {
                  Name = g.Key.Name,
                  Country = g.Key.Country,

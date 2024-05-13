@@ -1,39 +1,28 @@
 ﻿namespace Twitter.Clone.Trends.Repositories;
 
-public class TrendsByCountryRepository
+public class TrendsByCountryRepository(TrendsDbContext dbContext)
 {
-    private readonly IMongoCollection<TrendsByCountry> _trendsByCountryCollection;
-    private readonly static InsertOneOptions _insertOneOptions = new();
-    private readonly static UpdateOptions _updateOptions = new();
+    private readonly TrendsDbContext _dbContext = dbContext;
 
-    public TrendsByCountryRepository(
-        IOptions<TrendsDatabaseSettings> trendsDatabaseSettings)
+    public async Task CreateAsync(TrendByCountry newTrend, CancellationToken cancellationToken)
     {
-        var mongoClient = new MongoClient(
-            trendsDatabaseSettings.Value.ConnectionString);
-
-        var mongoDatabase = mongoClient.GetDatabase(
-            trendsDatabaseSettings.Value.DatabaseName);
-
-        _trendsByCountryCollection = mongoDatabase.GetCollection<TrendsByCountry>(
-            TrendsByCountry.CollectionName);
+        await _dbContext.TrendsByCountry.AddAsync(newTrend, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task CreateAsync(TrendsByCountry newTrend, CancellationToken cancellationToken) =>
-        await _trendsByCountryCollection.InsertOneAsync(newTrend, _insertOneOptions, cancellationToken);
+    public async Task<bool> TrendExistsAsync(string name, string country, CancellationToken cancellationToken) =>
+        await _dbContext.TrendsByCountry.Where(p => p.Name == name && p.Country == country)
+        .AnyAsync(cancellationToken);
 
-    public async Task<bool> TrendExistsAsync(string name, string country, CancellationToken cancellationToken)
+    public async Task UpdateAsync(string name, string country, int count, CancellationToken cancellationToken)
     {
-        var filter = Builders<TrendsByCountry>.Filter.And(
-        Builders<TrendsByCountry>.Filter.Eq(x => x.Name, name),
-            Builders<TrendsByCountry>.Filter.Eq(x => x.Country, country)
-        );
-
-        return await _trendsByCountryCollection.Find(filter).AnyAsync(cancellationToken);
+        var currentTrend = await _dbContext.TrendsByCountry
+            .SingleOrDefaultAsync(p => p.Name == name && p.Country == country, cancellationToken);
+        if (currentTrend is not null)
+        {
+            currentTrend.Count = count;
+            _dbContext.Entry(currentTrend).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
     }
-
-    public async Task UpdateAsync(string name, string country, int count, CancellationToken cancellationToken) =>
-        await _trendsByCountryCollection
-        .UpdateOneAsync(p => p.Name == name && p.Country == country,
-            Builders<TrendsByCountry>.Update.Set(p => p.Count, count), _updateOptions, cancellationToken);
 }

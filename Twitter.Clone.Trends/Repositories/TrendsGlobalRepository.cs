@@ -1,33 +1,26 @@
 ﻿namespace Twitter.Clone.Trends.Repositories;
 
-public class TrendsGlobalRepository
+public class TrendsGlobalRepository(TrendsDbContext dbContext)
 {
-    private readonly IMongoCollection<TrendsGlobal> _trendsGlobalCollection;
-    private readonly static InsertOneOptions _insertOneOptions = new();
-    private readonly static UpdateOptions _updateOptions = new();
+    private readonly TrendsDbContext _dbContext = dbContext;
 
-    public TrendsGlobalRepository(
-        IOptions<TrendsDatabaseSettings> trendsDatabaseSettings)
+    public async Task CreateAsync(TrendGlobal newTrend, CancellationToken cancellationToken)
     {
-        var mongoClient = new MongoClient(
-            trendsDatabaseSettings.Value.ConnectionString);
-
-        var mongoDatabase = mongoClient.GetDatabase(
-            trendsDatabaseSettings.Value.DatabaseName);
-
-        _trendsGlobalCollection = mongoDatabase.GetCollection<TrendsGlobal>(
-            TrendsGlobal.CollectionName);
+        await _dbContext.TrendsGlobal.AddAsync(newTrend, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task CreateAsync(TrendsGlobal newTrend, CancellationToken cancellationToken) =>
-        await _trendsGlobalCollection.InsertOneAsync(newTrend, _insertOneOptions, cancellationToken);
+    public async Task<bool> TrendExistsAsync(string name, CancellationToken cancellationToken) =>
+        await _dbContext.TrendsGlobal.AnyAsync(p => p.Name == name, cancellationToken);
 
-    public async Task<bool> TrendExistsAsync(string name, CancellationToken cancellationToken)
+    public async Task UpdateAsync(string name, int count, CancellationToken cancellationToken)
     {
-        return await _trendsGlobalCollection.Find(p => p.Name == name).AnyAsync(cancellationToken);
+        var currentTrend = await _dbContext.TrendsGlobal.SingleOrDefaultAsync(p => p.Name == name, cancellationToken);
+        if (currentTrend is not null)
+        {
+            currentTrend.Count = count;
+            _dbContext.Entry(currentTrend).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
     }
-
-    public async Task UpdateAsync(string name, int count, CancellationToken cancellationToken) =>
-        await _trendsGlobalCollection
-        .UpdateOneAsync(p => p.Name == name, Builders<TrendsGlobal>.Update.Set(p => p.Count, count), _updateOptions, cancellationToken);
 }

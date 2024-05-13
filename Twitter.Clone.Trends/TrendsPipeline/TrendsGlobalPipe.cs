@@ -18,7 +18,7 @@ public class TrendsGlobalPipe : BasePipe
         var trends = (await context.GetHashtagsByTimeSpanAsync(_makeTrendsSettings.Value.GlobalTrendTimeSpan))
              .GroupBy(x => new { x.Name })
              .Take(10)
-             .Select(g => new TrendsGlobal
+             .Select(g => new TrendGlobal
              {
                  Name = g.Key.Name,
                  Count = g.Count()
