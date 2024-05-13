@@ -3,55 +3,46 @@
 public class HashtagCommandHandler(
     HttpClient httpClient,
     IOptions<LocatorServiceSettings> locatorServiceOptions,
-    HashtagRepository hashtagRepository)
-    : IRequestHandler<HashtagCommand, bool>
+    HashtagRepository hashtagRepository,
+    ILogger<HashtagCommandHandler> logger)
+    : INotificationHandler<HashtagsEvent>
 {
     private readonly HttpClient _httpClient = httpClient;
     private readonly IOptions<LocatorServiceSettings> _locatorServiceOptions = locatorServiceOptions;
     private readonly HashtagRepository _hashtagRepository = hashtagRepository;
-    public async Task<bool> Handle(HashtagCommand request, CancellationToken cancellationToken)
+    private readonly ILogger<HashtagCommandHandler> _logger = logger;
+    public async Task Handle(HashtagsEvent request, CancellationToken cancellationToken)
     {
         HashtagEventValidator validator = new();
         try
         {
-            var hashtagContent = JsonSerializer.Deserialize<HashtagsEvent>(request.InboxContent);
-
-            if (hashtagContent != null && hashtagContent.Hashtags.Any())
+            var validationResult = validator.Validate(request);
+            if (validationResult.IsValid)
             {
-                var validationResult = validator.Validate(hashtagContent);
-                if (validationResult.IsValid)
+                var response = await _httpClient
+                    .GetFromJsonAsync<LocatorServiceResponse>(_locatorServiceOptions.Value.URL + request.IPAddress, cancellationToken);
+
+                if (response is null) throw new NullReferenceException("Locator Service response is null!");
+
+                foreach (var hashtag in request.Hashtags)
                 {
-                    var response = await _httpClient
-                        .GetAsync(_locatorServiceOptions.Value.URL + hashtagContent.IPAddress, cancellationToken);
-                    response.EnsureSuccessStatusCode();
-                    var jsonResponse = await response.Content.ReadAsStringAsync(cancellationToken);
-                    LocatorServiceResponse geoInformation = null!;
-
-                    if (!string.IsNullOrEmpty(jsonResponse))
-                    {
-                        geoInformation = JsonSerializer.Deserialize<LocatorServiceResponse>(jsonResponse)!;
-                    }
-
-                    foreach (var hashtag in hashtagContent.Hashtags)
-                    {
-                        await _hashtagRepository.CreateAsync(
-                            new Hashtag()
-                            {
-                                Name = hashtag,
-                                DateCreated = DateTime.UtcNow,
-                                IPAddress = hashtagContent.IPAddress,
-                                Country = geoInformation?.CountryName,
-                                Continent = geoInformation?.ContinentName
-                            },
-                            cancellationToken);
-                    }
+                    await _hashtagRepository.CreateAsync(
+                        new Hashtag
+                        {
+                            Name = hashtag,
+                            DateCreated = DateTime.UtcNow,
+                            IPAddress = request.IPAddress,
+                            Country = response.CountryName,
+                            Continent = response.ContinentName
+                        },
+                        cancellationToken);
                 }
             }
-            return true;
         }
-        catch
+        catch (Exception ex)
         {
-            return false;
+            _logger.LogError(ex,
+               "Error occurred in HashtagCommandHandler for entry: {request}", request);
         }
     }
 }

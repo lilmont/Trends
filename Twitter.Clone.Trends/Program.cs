@@ -1,23 +1,18 @@
-﻿using Twitter.Clone.Trends.Strategies;
-
-var builder = WebApplication.CreateBuilder(args);
+﻿var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.Configure<TrendsDatabaseSettings>(
-    builder.Configuration.GetSection("TrendsDatabase"));
-
 builder.Services.ConfigureBroker(builder.Configuration);
+builder.Services.ConfigureMongoDb(builder.Configuration);
 builder.Services.ConfigureLocatorSettings(builder.Configuration);
 builder.Services.ConfigureBackgroundSettings(builder.Configuration);
 
 builder.Services.AddHostedService<InboxBackgroundService>();
 
-builder.Services.AddSingleton<HashtagRepository>();
-builder.Services.AddSingleton<InboxHashtagRepository>();
-builder.Services.AddSingleton<InboxProcessor>();
+builder.Services.AddScoped<HashtagRepository>();
+builder.Services.AddScoped<InboxHashtagRepository>();
 
 builder.Services.AddHttpClient<InboxBackgroundService>();
 
