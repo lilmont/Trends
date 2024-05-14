@@ -15,7 +15,6 @@ public class TrendsByCountryPipe : BasePipe
 
     public async override void HandleAsync(HashtagRepository context, CancellationToken cancellationToken)
     {
-
         var trends = (await context.GetHashtagsByTimeSpanAsync(_makeTrendsSettings.Value.CountryTrendTimeSpan))
              .GroupBy(x => new { x.Name, x.Country })
              .Select(g => new TrendByCountry
