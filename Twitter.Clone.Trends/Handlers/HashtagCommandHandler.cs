@@ -20,9 +20,8 @@ public class HashtagCommandHandler(
             if (validationResult.IsValid)
             {
                 var response = await _httpClient
-                    .GetFromJsonAsync<LocatorServiceResponse>(_locatorServiceOptions.Value.URL + request.IPAddress, cancellationToken);
-
-                if (response is null) throw new NullReferenceException("Locator Service response is null!");
+                    .GetFromJsonAsync<LocatorServiceResponse>(_locatorServiceOptions.Value.URL + request.IPAddress, cancellationToken) 
+                    ?? throw new NullReferenceException("Locator Service response is null!");
 
                 foreach (var hashtag in request.Hashtags)
                 {
