@@ -4,6 +4,7 @@ global using FluentValidation;
 global using MassTransit;
 global using MediatR;
 global using Microsoft.EntityFrameworkCore;
+global using MongoDB.Driver;
 // Microsoft
 global using Microsoft.Extensions.Options;
 global using MongoDB.Bson;

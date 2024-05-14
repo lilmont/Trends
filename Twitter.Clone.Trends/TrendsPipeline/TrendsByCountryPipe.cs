@@ -6,8 +6,8 @@ public class TrendsByCountryPipe : BasePipe
     private readonly TrendsByCountryRepository _trendsByCountryRepository;
 
     public TrendsByCountryPipe(Action<HashtagRepository, CancellationToken> next,
-    IOptions<MakeTrendsSettings> makeTrendsSettings,
-    TrendsByCountryRepository trendsByCountryRepository) : base(next)
+        IOptions<MakeTrendsSettings> makeTrendsSettings,
+        TrendsByCountryRepository trendsByCountryRepository) : base(next)
     {
         _makeTrendsSettings = makeTrendsSettings;
         _trendsByCountryRepository = trendsByCountryRepository;
@@ -15,6 +15,7 @@ public class TrendsByCountryPipe : BasePipe
 
     public async override void HandleAsync(HashtagRepository context, CancellationToken cancellationToken)
     {
+
         var trends = (await context.GetHashtagsByTimeSpanAsync(_makeTrendsSettings.Value.CountryTrendTimeSpan))
              .GroupBy(x => new { x.Name, x.Country })
              .Select(g => new TrendByCountry

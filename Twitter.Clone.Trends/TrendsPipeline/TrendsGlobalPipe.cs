@@ -6,8 +6,8 @@ public class TrendsGlobalPipe : BasePipe
     private readonly TrendsGlobalRepository _trendsGlobalRepository;
 
     public TrendsGlobalPipe(Action<HashtagRepository, CancellationToken> next,
-    IOptions<MakeTrendsSettings> makeTrendsSettings,
-    TrendsGlobalRepository trendsGlobalRepository) : base(next)
+        IOptions<MakeTrendsSettings> makeTrendsSettings,
+        TrendsGlobalRepository trendsGlobalRepository) : base(next)
     {
         _makeTrendsSettings = makeTrendsSettings;
         _trendsGlobalRepository = trendsGlobalRepository;

@@ -1,26 +1,40 @@
 ﻿namespace Twitter.Clone.Trends.Repositories;
 
-public class TrendsGlobalRepository(TrendsDbContext dbContext)
+public class TrendsGlobalRepository(IServiceScopeFactory scopeFactory)
 {
-    private readonly TrendsDbContext _dbContext = dbContext;
+    private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
 
     public async Task CreateAsync(TrendGlobal newTrend, CancellationToken cancellationToken)
     {
-        await _dbContext.TrendsGlobal.AddAsync(newTrend, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        using (var scope = _scopeFactory.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<TrendsDbContext>();
+            await dbContext.TrendsGlobal.AddAsync(newTrend, cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
     }
 
-    public async Task<bool> TrendExistsAsync(string name, CancellationToken cancellationToken) =>
-        await _dbContext.TrendsGlobal.AnyAsync(p => p.Name == name, cancellationToken);
+    public async Task<bool> TrendExistsAsync(string name, CancellationToken cancellationToken)
+    {
+        using (var scope = _scopeFactory.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<TrendsDbContext>();
+            return await dbContext.TrendsGlobal.AnyAsync(p => p.Name == name, cancellationToken);
+        }
+    }
 
     public async Task UpdateAsync(string name, int count, CancellationToken cancellationToken)
     {
-        var currentTrend = await _dbContext.TrendsGlobal.SingleOrDefaultAsync(p => p.Name == name, cancellationToken);
-        if (currentTrend is not null)
+        using (var scope = _scopeFactory.CreateScope())
         {
-            currentTrend.Count = count;
-            _dbContext.Entry(currentTrend).State = EntityState.Modified;
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            var dbContext = scope.ServiceProvider.GetRequiredService<TrendsDbContext>();
+            var currentTrend = await dbContext.TrendsGlobal.SingleOrDefaultAsync(p => p.Name == name, cancellationToken);
+            if (currentTrend is not null)
+            {
+                currentTrend.Count = count;
+                dbContext.Entry(currentTrend).State = EntityState.Modified;
+                await dbContext.SaveChangesAsync(cancellationToken);
+            }
         }
     }
 }

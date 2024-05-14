@@ -17,7 +17,7 @@ builder.Services.AddScoped<TrendsByContinentRepository>();
 builder.Services.AddScoped<TrendsByCountryRepository>();
 builder.Services.AddScoped<TrendsGlobalRepository>();
 
-//builder.Services.AddHttpClient<InboxBackgroundService>();
+builder.Services.AddHttpClient<InboxBackgroundService>();
 
 builder.Services.AddHostedService<MakeTrendsBackgroundService>();
 builder.Services.AddHostedService<InboxBackgroundService>();

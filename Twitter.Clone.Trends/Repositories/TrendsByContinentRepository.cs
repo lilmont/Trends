@@ -1,28 +1,43 @@
 ﻿namespace Twitter.Clone.Trends.Repositories;
 
-public class TrendsByContinentRepository(TrendsDbContext dbContext)
+public class TrendsByContinentRepository(IServiceScopeFactory scopeFactory)
 {
-    private readonly TrendsDbContext _dbContext = dbContext;
+    private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
 
     public async Task CreateAsync(TrendByContinent newTrend, CancellationToken cancellationToken)
     {
-        await _dbContext.TrendsByContinent.AddAsync(newTrend, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        using (var scope = _scopeFactory.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<TrendsDbContext>();
+            await dbContext.TrendsByContinent.AddAsync(newTrend, cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
     }
 
-    public async Task<bool> TrendExistsAsync(string name, string continent, CancellationToken cancellationToken) =>
-        await _dbContext.TrendsByContinent.Where(p => p.Name == name && p.Continent == continent)
-        .AnyAsync(cancellationToken);
+    public async Task<bool> TrendExistsAsync(string name, string continent, CancellationToken cancellationToken)
+    {
+        using (var scope = _scopeFactory.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<TrendsDbContext>();
+            return await dbContext.TrendsByContinent
+                .Where(p => p.Name == name && p.Continent == continent)
+                .AnyAsync(cancellationToken);
+        }
+    }
 
     public async Task UpdateAsync(string name, string continent, int count, CancellationToken cancellationToken)
     {
-        var currentTrend = await _dbContext.TrendsByContinent
-            .SingleOrDefaultAsync(p => p.Name == name && p.Continent == continent, cancellationToken);
-        if (currentTrend is not null)
+        using (var scope = _scopeFactory.CreateScope())
         {
-            currentTrend.Count = count;
-            _dbContext.Entry(currentTrend).State = EntityState.Modified;
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            var dbContext = scope.ServiceProvider.GetRequiredService<TrendsDbContext>();
+            var currentTrend = await dbContext.TrendsByContinent
+            .SingleOrDefaultAsync(p => p.Name == name && p.Continent == continent, cancellationToken);
+            if (currentTrend is not null)
+            {
+                currentTrend.Count = count;
+                dbContext.Entry(currentTrend).State = EntityState.Modified;
+                await dbContext.SaveChangesAsync(cancellationToken);
+            }
         }
     }
 }

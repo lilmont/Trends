@@ -40,8 +40,8 @@ public static class ConfigurationExtension
                 throw new Exception("Invalid settings!");
             }
             options.UseMongoDB(settings.Host, settings.DatabaseName);
-            
-        });
+
+        }, ServiceLifetime.Scoped);
         return services;
     }
 
