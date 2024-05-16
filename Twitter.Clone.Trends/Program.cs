@@ -26,8 +26,12 @@ var app = builder.Build();
 
 app.MapGroup("/trends").MapGet("/global", async (TrendsGlobalRepository trendsGlobalRepository) =>
 {
-    var endpoints = new Endpoints(trendsGlobalRepository);
     return Results.Ok(await trendsGlobalRepository.GetTopTenAsync());
+});
+
+app.MapGroup("/trends").MapGet("/country/{countryName}", async ([FromRoute] string countryName, TrendsByCountryRepository trendsByCountryRepository) =>
+{
+    return Results.Ok(await trendsByCountryRepository.GetTrendsByCountryAsync(countryName));
 });
 
 app.UseHttpsRedirection();

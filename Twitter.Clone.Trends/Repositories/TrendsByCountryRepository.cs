@@ -35,4 +35,14 @@ public class TrendsByCountryRepository(IServiceScopeFactory scopeFactory)
             await dbContext.SaveChangesAsync(cancellationToken);
         }
     }
+
+    public async Task<List<TrendsResponse>> GetTrendsByCountryAsync(string countryName)
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TrendsDbContext>();
+        return await dbContext.TrendsByCountry.OrderByDescending(p => p.Count)
+            .Where(p => p.Country == countryName)
+            .Select(p => new TrendsResponse(p.Name, p.Count))
+            .ToListAsync();
+    }
 }
