@@ -22,8 +22,13 @@ builder.Services.AddHttpClient<InboxBackgroundService>();
 builder.Services.AddHostedService<MakeTrendsBackgroundService>();
 builder.Services.AddHostedService<InboxBackgroundService>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
-
 var app = builder.Build();
+
+app.MapGroup("/trends").MapGet("/global", async (TrendsGlobalRepository trendsGlobalRepository) =>
+{
+    var endpoints = new Endpoints(trendsGlobalRepository);
+    return Results.Ok(await trendsGlobalRepository.GetTopTenAsync());
+});
 
 app.UseHttpsRedirection();
 

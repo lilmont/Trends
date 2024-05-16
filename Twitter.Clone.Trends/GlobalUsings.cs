@@ -20,7 +20,9 @@ global using Twitter.Clone.Trends.Models.Entities;
 global using Twitter.Clone.Trends.Models.Validators;
 global using Twitter.Clone.Trends.Persistence;
 // Trends
+global using Twitter.Clone.Trends;
 global using Twitter.Clone.Trends.Repositories;
 global using Twitter.Clone.Trends.Responses;
 global using Twitter.Clone.Trends.Services;
 global using Twitter.Clone.Trends.TrendsPipeline;
+global using Twitter.Clone.Trends.Models.Dtos;
