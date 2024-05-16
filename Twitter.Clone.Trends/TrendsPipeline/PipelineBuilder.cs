@@ -4,7 +4,7 @@ public class PipelineBuilder(ILogger<PipelineBuilder> logger)
 {
     private readonly ILogger<PipelineBuilder> _logger = logger;
 
-    private readonly Dictionary<Type, object> _pipes = [];
+    private Dictionary<Type, object> _pipes = [];
     public PipelineBuilder AddPipe(Type type, object repository)
     {
         _pipes.Add(type, repository);
@@ -22,6 +22,7 @@ public class PipelineBuilder(ILogger<PipelineBuilder> logger)
                 selectedPipe = (BasePipe)Activator.CreateInstance(_pipes.ElementAt(i).Key, new object[] { selectedPipe.HandleAsync, makeTrendsSettings, _pipes.ElementAt(i).Value });
             }
             var firstPipe = (BasePipe)Activator.CreateInstance(_pipes.ElementAt(0).Key, new[] { selectedPipe.HandleAsync, makeTrendsSettings, _pipes.ElementAt(0).Value });
+            throw new Exception();
             return firstPipe.HandleAsync;
         }
         catch (Exception ex)

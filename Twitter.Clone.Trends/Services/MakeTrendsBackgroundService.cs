@@ -24,8 +24,9 @@ public class MakeTrendsBackgroundService(
                     var trendsByContinentRepository = scope.ServiceProvider.GetRequiredService<TrendsByContinentRepository>();
                     var trendsByCountryRepository = scope.ServiceProvider.GetRequiredService<TrendsByCountryRepository>();
                     var trendsGlobalRepository = scope.ServiceProvider.GetRequiredService<TrendsGlobalRepository>();
+                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<PipelineBuilder>>();
 
-                    var pipeline = new PipelineBuilder()
+                    var pipeline = new PipelineBuilder(logger)
                         .AddPipe(typeof(TrendsByCountryPipe), trendsByCountryRepository)
                         .AddPipe(typeof(TrendsByContinentPipe), trendsByContinentRepository)
                         .AddPipe(typeof(TrendsGlobalPipe), trendsGlobalRepository)
