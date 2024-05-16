@@ -31,4 +31,14 @@ public class TrendsGlobalRepository(IServiceScopeFactory scopeFactory)
             await dbContext.SaveChangesAsync(cancellationToken);
         }
     }
+
+    public async Task<List<TrendsResponse>> GetTopTenAsync()
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TrendsDbContext>();
+        return await dbContext.TrendsGlobal.OrderByDescending(p => p.Count)
+            .Select(p => new TrendsResponse(p.Name, p.Count))
+            .Take(10)
+            .ToListAsync();
+    }
 }
