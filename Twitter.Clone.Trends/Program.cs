@@ -1,4 +1,6 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using Microsoft.AspNetCore.Mvc;
+
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -32,6 +34,11 @@ app.MapGroup("/trends").MapGet("/global", async (TrendsGlobalRepository trendsGl
 app.MapGroup("/trends").MapGet("/country/{countryName}", async ([FromRoute] string countryName, TrendsByCountryRepository trendsByCountryRepository) =>
 {
     return Results.Ok(await trendsByCountryRepository.GetTrendsByCountryAsync(countryName));
+});
+
+app.MapGroup("/trends").MapGet("/continent/{continentName}", async ([FromRoute] string continentName, TrendsByContinentRepository trendsByContinentRepository) =>
+{
+    return Results.Ok(await trendsByContinentRepository.GetTrendsByContinentAsync(continentName));
 });
 
 app.UseHttpsRedirection();

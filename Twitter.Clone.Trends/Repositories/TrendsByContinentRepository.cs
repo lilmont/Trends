@@ -34,4 +34,14 @@ public class TrendsByContinentRepository(IServiceScopeFactory scopeFactory)
             await dbContext.SaveChangesAsync(cancellationToken);
         }
     }
+
+    public async Task<List<TrendsResponse>> GetTrendsByContinentAsync(string continentName)
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TrendsDbContext>();
+        return await dbContext.TrendsByContinent.OrderByDescending(p => p.Count)
+            .Where(p => p.Continent == continentName)
+            .Select(p => new TrendsResponse(p.Name, p.Count))
+            .ToListAsync();
+    }
 }
