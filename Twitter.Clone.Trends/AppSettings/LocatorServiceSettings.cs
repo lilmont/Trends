@@ -2,7 +2,7 @@
 
 public sealed class LocatorServiceSettings
 {
-        public const string SectionName = "LocatorService";
+    public const string SectionName = "LocatorService";
 
-        public required string URL { get; set; }
+    public required string URL { get; set; }
 }
